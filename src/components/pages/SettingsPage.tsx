@@ -91,12 +91,6 @@ export default function SettingsPage() {
   const [localThinkingBudget, setLocalThinkingBudget] = useState(
     activeSource?.thinkingBudget ?? 8192,
   );
-  const [localPollInterval, setLocalPollInterval] = useState(
-    activeSource?.pollIntervalMs?.toString() ?? "1000",
-  );
-  const [localMaxPoll, setLocalMaxPoll] = useState(
-    activeSource?.maxPollMs?.toString() ?? "30000",
-  );
   const [availableModels, setAvailableModels] = useState<AiModelSummary[]>([]);
   const [modelPopoverOpen, setModelPopoverOpen] = useState(false);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -110,8 +104,6 @@ export default function SettingsPage() {
     );
     setLocalTraits(activeSource?.traits ?? "");
     setLocalThinkingBudget(activeSource?.thinkingBudget ?? 8192);
-    setLocalPollInterval(activeSource?.pollIntervalMs?.toString() ?? "1000");
-    setLocalMaxPoll(activeSource?.maxPollMs?.toString() ?? "30000");
   }, [activeSource]);
 
   const navigate = useNavigate();
@@ -327,22 +319,6 @@ export default function SettingsPage() {
     if (!activeSource) return;
     setLocalThinkingBudget(value);
     updateSource(activeSource.id, { thinkingBudget: value });
-  };
-
-  const handlePollIntervalBlur = () => {
-    if (!activeSource) return;
-    const parsed = parseInt(localPollInterval, 10);
-    updateSource(activeSource.id, {
-      pollIntervalMs: Number.isFinite(parsed) ? parsed : undefined,
-    });
-  };
-
-  const handleMaxPollBlur = () => {
-    if (!activeSource) return;
-    const parsed = parseInt(localMaxPoll, 10);
-    updateSource(activeSource.id, {
-      maxPollMs: Number.isFinite(parsed) ? parsed : undefined,
-    });
   };
 
   const modelDisplay = useMemo(() => {
@@ -749,45 +725,6 @@ export default function SettingsPage() {
             </div>
             <p className="text-sm text-muted-foreground">{t("traits.desc")}</p>
           </div>
-
-          {activeSource?.provider === "openai" && (
-            <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="poll-interval">
-                  {t("openai.poll-interval.title")}
-                </Label>
-                <Input
-                  id="poll-interval"
-                  type="number"
-                  min={100}
-                  step={100}
-                  value={localPollInterval}
-                  onChange={(event) => setLocalPollInterval(event.target.value)}
-                  onBlur={handlePollIntervalBlur}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t("openai.poll-interval.desc")}
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="poll-timeout">
-                  {t("openai.poll-timeout.title")}
-                </Label>
-                <Input
-                  id="poll-timeout"
-                  type="number"
-                  min={1000}
-                  step={1000}
-                  value={localMaxPoll}
-                  onChange={(event) => setLocalMaxPoll(event.target.value)}
-                  onBlur={handleMaxPollBlur}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {t("openai.poll-timeout.desc")}
-                </p>
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
 

@@ -21,8 +21,6 @@ export interface AiSource {
   traits?: string;
   thinkingBudget?: number;
   enabled: boolean;
-  pollIntervalMs?: number;
-  maxPollMs?: number;
 }
 
 export interface AiClient {
@@ -90,8 +88,6 @@ function createDefaultSources(): AiSource[] {
       traits: legacy?.traits,
       thinkingBudget: legacy?.thinkingBudget ?? 8192,
       enabled: true,
-      pollIntervalMs: undefined,
-      maxPollMs: undefined,
     },
     {
       id: "openai-default",
@@ -103,8 +99,6 @@ function createDefaultSources(): AiSource[] {
       traits: undefined,
       thinkingBudget: undefined,
       enabled: false,
-      pollIntervalMs: 1_000,
-      maxPollMs: 30_000,
     },
   ];
 }
