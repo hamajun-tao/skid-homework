@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 
@@ -35,7 +35,9 @@ export default function ImportSettingsPage() {
   const [isImported, setIsImported] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { addSource } = useAiStore((s) => s);
+  const sourceId = useRef<null | string>(null);
+
+  const { addSource, removeSource } = useAiStore((s) => s);
 
   useEffect(() => {
     // 1. Get the hash from the URL
@@ -71,7 +73,7 @@ export default function ImportSettingsPage() {
   const handleConfirmImport = () => {
     if (!modelJson) return;
 
-    addSource({
+    const newSourceId = addSource({
       apiKey: modelJson.key,
       name: modelJson.name,
       model: modelJson.model,
@@ -80,12 +82,22 @@ export default function ImportSettingsPage() {
       enabled: true,
     });
 
+    sourceId.current = newSourceId;
+
     setIsImported(true);
   };
 
   // Handler: User cancels
   const handleCancel = () => {
     router.push("/");
+  };
+
+  const handleUndo = () => {
+    if (!sourceId.current) return;
+
+    removeSource(sourceId.current);
+
+    setIsImported(false);
   };
 
   // ------------------------------------------------------------------
@@ -143,14 +155,28 @@ export default function ImportSettingsPage() {
               successfully imported.
             </p>
           </CardContent>
-          <CardFooter className="justify-center space-x-2">
-            <Button onClick={() => router.push("/")}>Let&apos;s Skid</Button>
-            <Button
-              onClick={() => router.push("/settings")}
-              variant="secondary"
-            >
-              Settings
-            </Button>
+          <CardFooter>
+            <div className="flex flex-col w-full gap-2">
+              <div className="flex w-full gap-2">
+                <Button
+                  onClick={() => router.push("/settings")}
+                  variant="secondary"
+                  className="flex-1"
+                >
+                  Settings
+                </Button>
+                <Button
+                  onClick={handleUndo}
+                  variant="destructive"
+                  className="flex-1"
+                >
+                  Undo
+                </Button>
+              </div>
+              <Button onClick={() => router.push("/")} className="flex-1">
+                Let&apos;s Skid
+              </Button>
+            </div>
           </CardFooter>
         </Card>
       </div>
