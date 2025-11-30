@@ -160,6 +160,14 @@ interface Resources {
       },
       "tagline": "Local • Private • Free"
     },
+    "inspect-dialog": {
+      "answer": "Answer",
+      "close": "Close",
+      "desc": "Review the AI generated Markdown content.",
+      "explanation": "Explanation",
+      "problem": "Problem",
+      "title": "Inspect Details"
+    },
     "preview": {
       "drag-tip": "You can drag or paste your files to this panel.",
       "drag-tip-mobile": "Tap a card to zoom in. Swipe left or right to review everything.",

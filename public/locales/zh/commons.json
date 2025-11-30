@@ -553,6 +553,14 @@
       }
     }
   },
+  "inspect-dialog": {
+    "title": "检查原始数据",
+    "desc": "查看原始的 Markdown 文本",
+    "close": "关闭窗口",
+    "problem": "题目",
+    "answer": "答案",
+    "explanation": "解析"
+  },
   "sources": {
     "upload": "本地上传",
     "camera": "拍摄"

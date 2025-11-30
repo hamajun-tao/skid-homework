@@ -10,6 +10,8 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Kbd } from "../ui/kbd";
+import { useTranslation } from "react-i18next";
 
 export type InspectDialogProps = {
   answer: string;
@@ -33,14 +35,14 @@ export default function InspectDialog({
     // You could add a toast notification here
   };
 
+  const { t } = useTranslation("commons", { keyPrefix: "inspect-dialog" });
+
   return (
     <Dialog open={open} onOpenChange={onChange}>
       <DialogContent className="sm:max-w-[700px] flex flex-col max-h-[90vh] overflow-scroll">
         <DialogHeader>
-          <DialogTitle className="text-xl">Inspect Details</DialogTitle>
-          <DialogDescription>
-            Review the AI generated markdown.
-          </DialogDescription>
+          <DialogTitle className="text-xl">{t("title")}</DialogTitle>
+          <DialogDescription>{t("desc")}</DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="flex-1 pr-4 -mr-4">
@@ -49,7 +51,7 @@ export default function InspectDialog({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <h4 className="font-semibold leading-none tracking-tight text-primary">
-                  Problem
+                  {t("problem")}
                 </h4>
                 <Button
                   variant="ghost"
@@ -72,7 +74,7 @@ export default function InspectDialog({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <h4 className="font-semibold leading-none tracking-tight text-primary">
-                  Answer
+                  {t("answer")}
                 </h4>
                 <Button
                   variant="ghost"
@@ -95,7 +97,7 @@ export default function InspectDialog({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <h4 className="font-semibold leading-none tracking-tight text-primary">
-                  Explanation
+                  {t("explanation")}
                 </h4>
                 <Button
                   variant="ghost"
@@ -117,7 +119,7 @@ export default function InspectDialog({
         {/* Footer Actions */}
         <div className="flex justify-end pt-2">
           <Button variant="outline" onClick={() => onChange(false)}>
-            Close
+            {t("close")} <Kbd>ESC</Kbd>
           </Button>
         </div>
       </DialogContent>

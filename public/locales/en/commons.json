@@ -553,6 +553,14 @@
       }
     }
   },
+  "inspect-dialog": {
+    "title": "Inspect Details",
+    "desc": "Review the AI generated Markdown content.",
+    "close": "Close",
+    "problem": "Problem",
+    "answer": "Answer",
+    "explanation": "Explanation"
+  },
   "sources": {
     "upload": "Upload",
     "camera": "Camera"
