@@ -82,8 +82,7 @@ export default function MathGraph({ code }: { code: string }) {
         try {
           parsed = JSON.parse(code);
         } catch {
-          console.error(code);
-          throw new Error("Invalid JSON format");
+          // do nothing here
         }
 
         let config: AdvancedPlotConfig;
