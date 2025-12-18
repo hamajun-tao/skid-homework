@@ -66,6 +66,7 @@ export function useChatLogic() {
     if (!searchQuery.trim()) return threads;
     const lowerQuery = searchQuery.toLowerCase();
     return threads.filter((thread) =>
+      // TODO: search for chat content
       thread.title.toLowerCase().includes(lowerQuery),
     );
   }, [threads, searchQuery]);
