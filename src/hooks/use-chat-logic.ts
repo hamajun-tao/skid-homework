@@ -50,6 +50,7 @@ export function useChatLogic() {
   const updateMessage = useChatStore((state) => state.updateMessage);
   const updateThread = useChatStore((state) => state.updateThread);
   const deleteChat = useChatStore((state) => state.deleteChat);
+  const searchChats = useChatStore((state) => state.searchChats);
   const messagesMap = useChatStore((state) => state.messages);
 
   const [activeChatId, setActiveChatId] = useState<string | undefined>(
@@ -61,17 +62,41 @@ export function useChatLogic() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Set<string> | null>(null);
   const [modelInput, setModelInput] = useState("");
   const [currentSourceId, setCurrentSourceId] = useState<string | null>(null);
 
+  // Handle Search Logic
+  useEffect(() => {
+    const trimmed = searchQuery.trim();
+    if (!trimmed) {
+      setSearchResults(null);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      searchChats(trimmed)
+        .then((ids) => setSearchResults(new Set(ids)))
+        .catch(console.error);
+    }, 300); // Debounce
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, searchChats]);
+
   const filteredThreads = useMemo(() => {
     if (!searchQuery.trim()) return threads;
+
+    // If we have search results, filter by ID
+    if (searchResults) {
+      return threads.filter((thread) => searchResults.has(thread.id));
+    }
+
+    // Fallback: simple title filter while waiting for DB results (optional)
     const lowerQuery = searchQuery.toLowerCase();
     return threads.filter((thread) =>
-      // TODO: search for chat content
       thread.title.toLowerCase().includes(lowerQuery),
     );
-  }, [threads, searchQuery]);
+  }, [threads, searchQuery, searchResults]);
 
   const navigateToChat = useCallback(
     (chatId: string | undefined) => {

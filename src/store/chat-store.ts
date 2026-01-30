@@ -50,6 +50,7 @@ interface ChatState {
   renameChat: (chatId: string, title: string) => Promise<void>;
   deleteChat: (chatId: string) => Promise<void>;
   clearAllChats: () => Promise<void>;
+  searchChats: (query: string) => Promise<string[]>;
 }
 
 const sortThreadsByUpdated = (threads: ChatThreadRecord[]) =>
@@ -304,5 +305,29 @@ export const useChatStore = create<ChatState>((set) => ({
       messages: {},
       isHydrated: true,
     });
+  },
+
+  searchChats: async (query: string) => {
+    if (!query || query.trim().length === 0) return [];
+    const lowerQuery = query.toLowerCase();
+
+    // 1. Search in Thread Titles
+    const matchingThreadIds = new Set<string>();
+    const allThreads = await chatDb.threads.toArray();
+    allThreads.forEach((t) => {
+      if (t.title.toLowerCase().includes(lowerQuery)) {
+        matchingThreadIds.add(t.id);
+      }
+    });
+
+    // 2. Search in Messages content
+    // Note: This filters all messages. For very large DBs, full-text indexing is recommended.
+    const matchingMessages = await chatDb.messages
+      .filter((m) => m.content.toLowerCase().includes(lowerQuery))
+      .toArray();
+
+    matchingMessages.forEach((m) => matchingThreadIds.add(m.chatId));
+
+    return Array.from(matchingThreadIds);
   },
 }));
