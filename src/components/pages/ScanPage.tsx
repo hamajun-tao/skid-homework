@@ -29,6 +29,7 @@ import { useRouter } from "next/navigation";
 import { useShortcut } from "@/hooks/use-shortcut";
 import OpenCVLoader from "../OpenCVLoader";
 import { getEnabledToolCallingPrompts } from "@/ai/prompts/prompt-manager";
+import { useStoreInitialization } from "@/hooks/use-store-initialization";
 
 export default function ScanPage() {
   const { t } = useTranslation("commons", { keyPrefix: "scan-page" });
@@ -48,6 +49,7 @@ export default function ScanPage() {
     appendStreamedOutput,
     clearStreamedOutput,
   } = useProblemsStore((s) => s);
+  const isStoreReady = useStoreInitialization();
 
   const { imageEnhancement, traits } = useSettingsStore((s) => s);
 
@@ -425,6 +427,17 @@ ${traits}
       setWorking(false);
     }
   };
+
+  if (!isStoreReady) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <p className="text-muted-foreground animate-pulse">
+          {/*TODO: I18N for the loading text*/}
+          Loading history...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
