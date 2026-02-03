@@ -7,7 +7,7 @@ import {
 } from "../ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { Button } from "../ui/button";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useProblemsStore } from "@/store/problems-store";
 import { useTranslation } from "react-i18next";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -21,6 +21,8 @@ import ActiveSolutionContent from "./ActiveSolutionContent";
 export default function SolutionsArea() {
   const { t } = useTranslation("commons", { keyPrefix: "solutions" });
   const { t: tCommon } = useTranslation("commons");
+
+  const viewerRef = useRef<HTMLDivElement | null>(null);
 
   const {
     imageItems,
@@ -104,12 +106,17 @@ export default function SolutionsArea() {
     )
       return;
 
-    if (e.key === "ArrowRight" && (e.ctrlKey || !e.shiftKey)) {
-      // Simple right or Ctrl+Right
-      // Check if focus is deep inside the viewer?
-      // Simplified: If user hits right arrow at the top level, switch image
-      // Note: SolutionViewer might consume Arrow keys for problem nav.
-      // Usually, use Ctrl+Arrow for Image nav to avoid conflict.
+    // Restore original navigation logic: Tab or Arrows for Image switching
+    if (e.key === "Tab" || e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+
+      // Shift+Tab OR ArrowLeft = Previous
+      // Tab OR ArrowRight = Next
+      const isPrev = e.shiftKey || e.key === "ArrowLeft";
+      handleNavigateImage(isPrev ? "prev" : "next");
+
+      // focus the viewer
+      setTimeout(() => viewerRef.current?.focus(), 0);
     }
   };
 
@@ -196,6 +203,7 @@ export default function SolutionsArea() {
                 >
                   {selectedImageId === entry.item.id && (
                     <ActiveSolutionContent
+                      ref={viewerRef}
                       entry={entry}
                       isActive={true}
                       onNavigateImage={handleNavigateImage}

@@ -20,12 +20,14 @@ import { animated, to, useSpring } from "@react-spring/web";
 import { OrderedSolution } from "@/hooks/use-solution-export";
 
 export type ActiveSolutionContentProps = {
+  ref?: React.Ref<HTMLDivElement>;
   entry: OrderedSolution;
   isActive: boolean;
   onNavigateImage: (direction: "next" | "prev") => void;
 };
 
 export default function ActiveSolutionContent({
+  ref,
   entry,
   isActive,
   onNavigateImage,
@@ -79,12 +81,8 @@ export default function ActiveSolutionContent({
       e.preventDefault();
       if (e.shiftKey) goPrevProblem();
       else goNextProblem();
+      // TODO: the viewerRef is confusing, may it should be removed?
       viewerRef.current?.focus();
-    } else if (e.key === "ArrowLeft" && !e.ctrlKey) {
-      // Optional: Add arrow key nav for problems if desired,
-      // but originally it was used for Images in the monolithic component.
-      // Let's stick to the original "Left/Right" maps to images logic at parent
-      // or handle swipe here.
     }
   };
 
@@ -158,6 +156,7 @@ export default function ActiveSolutionContent({
 
   return (
     <animated.div
+      ref={ref}
       tabIndex={0}
       className="outline-none"
       onKeyDown={handleKeyDown}
