@@ -578,6 +578,7 @@ interface Resources {
       "adb": {
         "connect": "ADB 连接",
         "connecting": "连接中...",
+        "menu-aria-label": "ADB 操作菜单",
         "reconnect": "重新连接 ADB",
         "screenshot": "ADB 截图",
         "screenshot-busy": "采集中...",

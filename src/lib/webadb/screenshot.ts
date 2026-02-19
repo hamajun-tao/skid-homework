@@ -2,60 +2,80 @@ import type {Adb} from '@yume-chan/adb';
 import {AdbDaemonWebUsbDevice} from '@yume-chan/adb-daemon-webusb';
 import {AdbManager} from './manager';
 
-let manager: AdbManager = new AdbManager();
+let _manager: AdbManager | undefined;
+let _adbConnection: Adb | undefined;
 let selectedDevice: AdbDaemonWebUsbDevice | undefined;
 
-function resetAdbManager() {
-    manager = new AdbManager();
-    selectedDevice = undefined;
-}
-
-async function syncSelectedDevice(): Promise<boolean> {
-    const devices = await manager.getDevices();
+async function _syncSelectedDevice(): Promise<boolean> {
+    const devices = await getAdbManager().getDevices();
 
     if (!devices.length) {
-        selectedDevice = undefined;
         return false;
     }
 
     // Keep using the previously chosen device if it's still connected.
     if (selectedDevice) {
-        const stillConnected = devices.some(
+        return devices.some(
             (device) => device.serial === selectedDevice!.serial,
         );
-        if (stillConnected) {
-            return true;
-        }
     }
 
-    // Fall back to the first available device so follow-up calls can reuse it.
-    selectedDevice = devices[0];
-    return true;
+    return false;
 }
 
-export async function takeScreenshot(adb: Adb): Promise<Blob> {
-    const socket = await adb.subprocess.shellProtocol!.spawn('screencap -p');
-    const reader = socket.stdout.getReader();
-
-    const chunks: Uint8Array[] = [];
-    try {
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) {
-                break;
-            }
-            chunks.push(value);
+function getAdbManager(): AdbManager {
+    if (!_manager) {
+        try {
+            _manager = new AdbManager();
+        } catch (e) {
+            console.error("Failed to initialize AdbManager. WebUSB might not be supported.", e);
+            throw e;
         }
-    } finally {
-        reader.releaseLock();
+    }
+    return _manager;
+}
+
+async function getAdbConnection(): Promise<Adb> {
+    let hasConnectedDevice = await _syncSelectedDevice();
+
+    // if user haven't connected a device yet, prompt them to select one.
+    // This is needed for the first time usage.
+    if (!hasConnectedDevice) {
+        const device = await getAdbManager().requestDevice();
+        if (!device) {
+            throw new Error('WebADB: No device selected');
+        }
+        selectedDevice = device;
+        hasConnectedDevice = await _syncSelectedDevice();
     }
 
-    return new Blob(chunks as BlobPart[], { type: 'image/png' });
+    if (!hasConnectedDevice || !selectedDevice) {
+        throw new Error('WebADB: No ADB device connected');
+    }
+
+    if (!_adbConnection) {
+        _adbConnection = await getAdbManager().connect(selectedDevice);
+    }
+
+    try{
+        await _adbConnection.subprocess.shellProtocol!.spawn('')
+    } catch (e) {
+        console.warn('WebADB: ADB connection seems to be broken, resetting connection...', e);
+        _adbConnection = await getAdbManager().connect(selectedDevice);
+    }
+
+    return _adbConnection;
+}
+
+function resetAdbManager() {
+    _manager = undefined;
+    _adbConnection = undefined;
+    selectedDevice = undefined;
 }
 
 export async function isAdbDeviceConnected(): Promise<boolean> {
     try {
-        return await syncSelectedDevice();
+        return await _syncSelectedDevice();
     } catch (error) {
         console.error('Failed to check ADB device connection', error);
         return false;
@@ -64,7 +84,7 @@ export async function isAdbDeviceConnected(): Promise<boolean> {
 
 export async function reconnectAdbDevice(): Promise<boolean> {
     resetAdbManager();
-    const device = await manager.requestDevice();
+    const device = await getAdbManager().requestDevice();
     if (!device) {
         return false;
     }
@@ -73,24 +93,23 @@ export async function reconnectAdbDevice(): Promise<boolean> {
 }
 
 export async function captureAdbScreenshot(): Promise<File> {
-    const hasConnectedDevice = await syncSelectedDevice();
+    const adb = await getAdbConnection();
+    const socket = await adb.subprocess.shellProtocol!.spawn('screencap -p');
+    const reader = socket.stdout.getReader();
 
-    if (!hasConnectedDevice) {
-        const device = await manager.requestDevice();
-        if (!device) {
-            throw new Error('No device selected');
+    const chunks: Uint8Array[] = [];
+    try {
+        while (true) {
+            const {done, value} = await reader.read();
+            if (done) {
+                break;
+            }
+            chunks.push(value);
         }
-        selectedDevice = device;
+    } finally {
+        reader.releaseLock();
     }
-
-    if (!selectedDevice) {
-        throw new Error('No device selected');
-    }
-
-    const adb = await manager.connect(selectedDevice);
-    const blob = await takeScreenshot(adb);
-    await adb.close();
-
+    const blob = new Blob(chunks as BlobPart[], {type: 'image/png'});
     const fileName = `screenshot_${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
     return new File([blob], fileName, {type: 'image/png'});
 }

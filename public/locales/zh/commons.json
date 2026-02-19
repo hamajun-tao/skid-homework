@@ -234,7 +234,8 @@
       "screenshot": "ADB 截图",
       "connecting": "连接中...",
       "screenshot-busy": "采集中...",
-      "screenshot-hint": "通过 ADB（WebUSB）从已连接的安卓设备捕获屏幕截图"
+      "screenshot-hint": "通过 ADB（WebUSB）从已连接的安卓设备捕获屏幕截图",
+      "menu-aria-label": "ADB 操作菜单"
     }
   },
   "uploads-info": {

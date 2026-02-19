@@ -238,7 +238,8 @@
       "screenshot": "ADB Screenshot",
       "connecting": "Connecting...",
       "screenshot-busy": "Capturing...",
-      "screenshot-hint": "Capture a screenshot from a connected Android device via ADB (WebUSB)"
+      "screenshot-hint": "Capture a screenshot from a connected Android device via ADB (WebUSB)",
+      "menu-aria-label": "ADB Menu"
     }
   },
   "uploads-info": {

@@ -12,6 +12,11 @@ export class AdbManager {
     private credentialStore: AdbWebCredentialStore;
 
     constructor() {
+        // ensure WebUSB is supported before initializing the manager
+        if (typeof navigator === 'undefined' || !('usb' in navigator) || !navigator.usb) {
+            throw new Error('WebUSB is not supported in this environment. Unable to initialize AdbManager.');
+        }
+
         const webUsb = navigator.usb;
         this.manager = new AdbDaemonWebUsbDeviceManager(webUsb);
         this.credentialStore = new AdbWebCredentialStore();

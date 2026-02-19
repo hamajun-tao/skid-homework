@@ -234,7 +234,7 @@ export default function SettingsPage() {
         action: "adbScreenshot" as ShortcutAction,
         label: translateSettings("shortcuts.actions.adb-screenshot.label"),
         description: translateSettings(
-          "shortcuts.actions.adbScreenshot.description",
+          "shortcuts.actions.adb-screenshot.description",
         ),
       },
       {

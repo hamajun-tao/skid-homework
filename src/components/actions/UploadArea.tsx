@@ -293,7 +293,7 @@ export default function UploadArea({ appendFiles, allowPdf }: UploadAreaProps) {
                   size="icon"
                   className="px-3"
                   disabled={isWorking || adbBusy}
-                  aria-label="ADB menu"
+                  aria-label={t("adb.menu-aria-label")}
                 >
                   <MoreVertical className="h-5 w-5" />
                 </Button>
