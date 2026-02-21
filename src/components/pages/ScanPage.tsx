@@ -81,12 +81,12 @@ export default function ScanPage() {
     items.length ? "preview" : "capture",
   );
   useShortcut(
-      "openChat",
-      (event) => {
-        event.preventDefault();
-        router.push("/chat");
-      },
-      [router],
+    "openChat",
+    (event) => {
+      event.preventDefault();
+      router.push("/chat");
+    },
+    [router],
   );
 
   useEffect(() => {
