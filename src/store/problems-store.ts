@@ -2,9 +2,8 @@ import { create } from "zustand";
 import { db, type HomeworkRecord } from "@/db/problems-db";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-// --- TYPE DEFINITIONS ---
-
 export type FileStatus = "success" | "pending" | "failed" | "processing";
+export type HomeworkSource = "upload" | "camera" | "adb";
 
 export type FileItem = {
   id: string;
@@ -12,7 +11,7 @@ export type FileItem = {
   displayName: string;
   mimeType: string;
   url: string; // Object URL for client-side preview
-  source: "upload" | "camera" | "adb"; // Origin of the image
+  source: HomeworkSource;
   status: FileStatus;
 };
 

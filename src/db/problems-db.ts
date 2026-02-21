@@ -1,12 +1,16 @@
 import Dexie, { type Table } from "dexie";
-import type { Solution, FileStatus } from "@/store/problems-store";
+import type {
+  Solution,
+  FileStatus,
+  HomeworkSource,
+} from "@/store/problems-store";
 
 export interface HomeworkRecord {
   id: string;
   blob: Blob;
   fileName: string;
   mimeType: string;
-  source: "upload" | "camera";
+  source: HomeworkSource;
   status: FileStatus;
   createdAt: number;
 
